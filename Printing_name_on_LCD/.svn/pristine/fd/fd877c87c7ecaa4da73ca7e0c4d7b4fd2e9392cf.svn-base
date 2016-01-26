@@ -1,0 +1,105 @@
+/*
+  Name:Mukesh Gupta(2014149) and Ravi(2014145)
+  Print back to back name on lcd.
+*/    
+#include <avr/io.h>
+#include <util/delay.h>
+#define lcd_busdata_direction DDRB 
+ 
+#define lcd_busdata	PORTB      
+#define control_lcd PORTB      
+ 
+#define rs 0                
+#define rw 1                
+#define en 2
+ 
+#define LCDMaxLines 2
+#define LCDMaxChars 16
+#define LineOne 0x80
+#define LineTwo 0xc0
+void LCD_Init();
+void LCD_CmdWrite( char cmd);
+void cmd_implementation(unsigned char character);
+void LCD_DataWrite( char dat);
+void data_implementation(unsigned char character);
+void sendastring(char *String);
+
+void LCD_Init()
+{
+   _delay_ms(50);
+   lcd_busdata_direction = 0xff;   //set both lcd_busdata and controllcd ad output
+   DDRB |= ((1<<rs)|(1<<rw)|(1<<en));   //setup the LCD control signals on PortB
+   PORTB = 0x00;
+   LCD_CmdWrite(0x03);        //Write D7-4 = 3 hex, with RS = 0
+   _delay_ms(5);
+   LCD_CmdWrite(0x03);
+   _delay_ms(200);
+   LCD_CmdWrite(0x03);
+   _delay_ms(200);
+   LCD_CmdWrite(0x02);	       // set to 4 bit
+   LCD_CmdWrite(0x28);        //cmd for 2 lines
+   LCD_CmdWrite(0x0E);	      // display on and cursor off
+   LCD_CmdWrite(0x01);	      //clear screen
+   LCD_CmdWrite(0x80);      // cmd to set cursor at 0,0
+ 
+}
+void LCD_CmdWrite( char cmd)
+{
+ 
+    char character=(cmd) & 0xf0;     //set higher nibble 
+    cmd_implementation(character);  
+    character=((cmd<<4) & 0xf0);			
+    cmd_implementation(character);
+  
+}
+void cmd_implementation(unsigned char character){
+    lcd_busdata=character;       //send higher nibble to lcd_busdata
+    control_lcd &=~(1<<rs);    //set cmd register by rs=0;
+    control_lcd &=~(1<<rw);    //set write operation by rw=0;
+    control_lcd |=1<<en;     
+	_delay_us(1);
+    control_lcd &=~(1<<en);
+ 
+    _delay_us(10);
+  
+} 
+void LCD_DataWrite( char dat)
+{
+   char character=(dat & 0xf0);    //set higher nibble
+   data_implementation(character);
+   character=((dat <<4) & 0xf0); 
+   data_implementation(character);   
+ 
+}
+void data_implementation(unsigned char character){
+    lcd_busdata=character;	  //send higher nibble to lcd_busdata
+    control_lcd |=1<<rs;	  //set data register by rs=1;
+    control_lcd &=~(1<<rw);	  //set write operation by rw=0;
+    control_lcd |=1<<en;	  
+    _delay_us(1);
+    control_lcd &=~(1<<en);
+    _delay_us(10);
+  
+}
+void sendastring(char *String)
+{
+	while(*String != '\0')
+	{
+		LCD_DataWrite(*String++);
+	}
+}	
+
+int main(){
+   LCD_Init();
+   while(1){
+   
+    sendastring("Mukesh");
+    delay(2);
+    LCD_CmdWrite(0x01);
+    LCD_CmdWrite(0x80);
+    sendastring("Ravi");
+    delay(2);
+    LCD_CmdWrite(0x01);
+    LCD_CmdWrite(0x80);
+   } 
+}

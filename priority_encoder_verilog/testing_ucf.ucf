@@ -1,0 +1,14 @@
+# Pin assignment for SWs / Inputs
+NET d<7> LOC ="N3";
+NET d<6> LOC ="E2";
+NET d<5> LOC ="F3";
+NET d<4> LOC ="G3";
+NET d<3> LOC ="B4";
+NET d<2> LOC ="K3";
+NET d<1> LOC ="L3";
+
+# Pin assignment for LEDs / Outputs
+NET d<0> LOC ="P11";
+NET C<2> LOC ="P7";
+NET C<1> LOC ="M11";
+NET C<0>	LOC ="M5"; 

@@ -1,0 +1,15 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main (void)
+{
+  DDRB = 0xFF; // Set the PORT as the output
+  while (1){
+    PORTB = 0x30; //Set the PORT to HIGH
+    _delay_ms(1000);
+    PORTB = 0x00; //Set the PORT to LOW
+    _delay_ms(1000);
+    }
+  return 0;
+}
+
